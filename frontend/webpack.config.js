@@ -26,7 +26,10 @@ module.exports = {
         exclude: /node_modules/,
         use: [{
           loader: 'babel-loader',
-          options: { presets: ['react', 'es2016'] },
+          options: {
+              presets: ['react', 'es2016'] ,
+              plugins: ['transform-class-properties']
+          },
         }],
       },
     ],
@@ -41,6 +44,7 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env': {
         ENDPOINT: JSON.stringify(process.env.ENDPOINT || 'http://0.0.0.0:9000/api'),
+        PORT: JSON.stringify(process.env.PORT) 
       },
     }),
   ],

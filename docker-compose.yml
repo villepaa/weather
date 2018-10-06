@@ -1,0 +1,17 @@
+version: "3.7"
+services:
+  backend:
+    build:
+      ./backend
+    ports:
+      - "9000:9000"
+    env_file: .env
+    
+  frontend:
+    build:
+      ./frontend
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      - ./frontend:/weatherapp-frontend:rw

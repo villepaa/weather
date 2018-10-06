@@ -1,18 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Icon from "./components/Icon"
+import Header from "./components/Header"
 
-const baseURL = process.env.ENDPOINT;
-
-const getWeatherFromApi = async () => {
-  try {
-    const response = await fetch(`${baseURL}/weather`);
-    return response.json();
-  } catch (error) {
-    console.error(error);
-  }
-
-  return {};
-};
+import {getForecastFromApi,getWeatherFromApi,getWeatherFromApiWithCoordinates} from "./api/weatherApi"
 
 class Weather extends React.Component {
   constructor(props) {
@@ -20,20 +11,57 @@ class Weather extends React.Component {
 
     this.state = {
       icon: "",
+      city: null,
+      lat: null,
+      lon: null
     };
   }
 
   async componentWillMount() {
-    const weather = await getWeatherFromApi();
-    this.setState({icon: weather.icon.slice(0, -1)});
+    this.getWeather();
+  }
+
+  async getWeather(){
+    const data = await getWeatherFromApi();
+    const weather = data.weather[0];
+    this.setState({city: data.name, lat: null, lon: null,icon: weather.icon.slice(0, -1)});
+  }
+
+  async getForecast(){
+    const data = await getForecastFromApi();
+    console.log(data);
+    const weather = data.list[0].weather;
+    this.setState({city: data.city.name, lat:null, lon: null, icon: weather[0].icon.slice(0, -1)});
+  }
+
+  async getLocationForWeather(){
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+  };
+
+  async getWeatherWithCoordinates(){
+    const position = await this.getLocationForWeather();
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    const data = await getWeatherFromApiWithCoordinates(latitude,longitude);
+    const weather = data.weather[0];
+    console.log(data);
+    this.setState({city: data.name, lat: latitude, lon: longitude, icon: weather.icon.slice(0, -1)});
   }
 
   render() {
-    const { icon } = this.state;
+    const { icon, city, lat, lon } = this.state;
 
     return (
-      <div className="icon">
-        { icon && <img src={`/img/${icon}.svg`} /> }
+      <div>
+        <nav>
+          <a href="#" onClick={this.getWeather.bind(this)}>Current weather</a> |
+          <a href="#" onClick={this.getForecast.bind(this)}>Forecast (3h)</a> |
+          <a href="#" onClick={this.getWeatherWithCoordinates.bind(this)}>Weather on current Location</a>
+        </nav>
+        <Header text={"Weather in"} city={city} lat={lat} lon={lon}/>,
+        <Icon icon={icon} />
       </div>
     );
   }
