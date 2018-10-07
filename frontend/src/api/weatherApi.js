@@ -38,4 +38,4 @@ const getForecastFromApi = async () => {
 
 
 
-export {getLocationForWeather,getLocation,getForecastFromApi,getWeatherFromApi,getWeatherFromApiWithCoordinates}
+export {getForecastFromApi,getWeatherFromApi,getWeatherFromApiWithCoordinates}
